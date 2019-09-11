@@ -1,0 +1,133 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+#map{
+    height: 750px;
+    width: 750px;
+}
+
+.leaflet-popup-tip {
+    display: none;
+}
+
+.leaflet-popup-content-wrapper{
+    width: 600px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.place_detail{
+    position: absolute;
+    top: -5px;
+    left: 205px;
+}
+
+.margin0{
+    margin: 0;
+}
+
+.inline-block{
+    display: inline-block;
+}
+
+.place_detail_set{
+    margin-left: 10px;
+    width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.place_detail_address{
+    margin-left: 10px;
+    width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.place_detail_facility{
+    margin-left: 10px;
+    width: 540px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.marker-cluster > div > span{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.all_sentence{
+    background-color: #c7cfff;
+    font-size: 30px;
+    font-weight: bold;
+    white-space: normal;
+    border-radius: 25px;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+    right: -75px;
+    bottom: -110px;
+    border: solid black 3px;
+}
+
+.all_sentence_address{
+    background-color: #c7cfff;
+    font-size: 30px;
+    font-weight: bold;
+    white-space: normal;
+    border-radius: 25px;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+    right: -90px;
+    bottom: -35px;
+    border: solid black 3px;
+}
+
+.all_sentence_set{
+    background-color: #c7cfff;
+    font-size: 30px;
+    font-weight: bold;
+    white-space: normal;
+    border-radius: 25px;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+    right: -90px;
+    bottom: 35px;
+    border: solid black 3px;
+}
+
+.tel-title{
+    width: 100px;
+}
+
+.create-title{
+    width: 80px;
+}
+
+.tel-num{
+    width: 230px;
+    text-align: right;
+}
+
+.create-at{
+    text-align: right;
+    width: 250px;
+}

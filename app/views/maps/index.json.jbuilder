@@ -1,0 +1,1 @@
+json.image @target_image
