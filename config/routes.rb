@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
 
-  resources :maps
+  resources :maps do
+    get 'about', :on => :collection
+  end
+
 end

@@ -117,7 +117,7 @@
     position: absolute;
     z-index: 2;
     right: -90px;
-    bottom: 35px;
+    bottom: 37px;
     border: solid black 3px;
 }
 
@@ -238,4 +238,15 @@ nav li{
     text-align: center;
     padding: 10px 0;
     list-style: none;
+}
+
+#video{
+    object-fit: fill;
+    width: 600px;
+    height: 480px;
+}
+
+.image_field{
+    width: 600px;
+    height: 480px;
 }

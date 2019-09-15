@@ -1,0 +1,3 @@
+<% @aed_inf.each do |aed| %>
+  <%= image_tag attachment_url(aed, :aed_image, :fill, 300, 240, format: "jpeg"), class: 'attachment user profile_image fallback' %>
+<% end %>

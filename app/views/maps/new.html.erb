@@ -1,0 +1,30 @@
+<%= form_with model: @aed_inf, url: maps_path, method: :post, local: true, id: "aed_inf_form" do |form| %>
+  <div class="image_field">
+    <canvas id="canvas" style="display: none;"></canvas>
+    <video id="video" autoplay="1"></video>
+    <img id="image">
+
+  </div>
+
+  <div class="name_facility_field">
+    <%= form.text_field :facility %>
+  </div>
+
+  <div class="set_position_field">
+    <%= form.text_field :installation_location %>
+  </div>
+
+  <%= form.attachment_field :aed_image, style: 'display: none'%>
+  <%= form.hidden_field :image_url %>
+  <%= form.hidden_field :latitude %>
+  <%= form.hidden_field :longitude %>
+<% end %>
+
+<div class="image_shutter_btn">
+  <button id="shutter">撮影</button>
+  <button id="retry" style="display: none">取り直し</button>
+</div>
+
+<div id="aed_inf_confirm_btn">
+  <button id="aed_inf_confirm">送信</button>
+</div>
