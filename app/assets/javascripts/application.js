@@ -66,6 +66,7 @@ $(document).on("turbolinks:load", function() {
                             let longitude = data.longitude
                             let map = callback(latitude, longitude)
                             //TODO モックデータ
+                            console.log(gon.aed_inf)
                             coordinateArray = [{
                                 'latitude': latitude,
                                 'longitude': longitude

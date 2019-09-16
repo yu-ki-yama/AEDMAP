@@ -66,3 +66,4 @@ gem 'jquery-ui-rails'
 gem 'font-awesome-rails'
 gem "refile", require: "refile/rails", github: 'manfe/refile'
 gem "refile-mini_magick"
+gem "gon"

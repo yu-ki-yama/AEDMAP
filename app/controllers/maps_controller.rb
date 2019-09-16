@@ -3,7 +3,7 @@ class MapsController < ApplicationController
     if request.xhr?
       @target_image = helpers.asset_url("cat53.jpg")
     else
-
+      gon.aed_inf = AedInformation.all
     end
   end
 
