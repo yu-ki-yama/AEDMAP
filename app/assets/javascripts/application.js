@@ -19,37 +19,37 @@
 $(document).on("turbolinks:load", function() {
 
     if($('#map').length) {
-
-        $(document).on("mouseenter", ".place_detail_facility", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_facility", function () {
-            $('.all_sentence').remove()
-        });
-
-        $(document).on("mouseenter", ".place_detail_address", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence_address">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_address", function () {
-            $('.all_sentence_address').remove()
-        });
-
-        $(document).on("mouseenter", ".place_detail_set", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence_set">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_set", function () {
-            $('.all_sentence_set').remove()
-        });
-
-        $(document).on("mouseenter", ".all_sentence", function (e) {
-            $('.all_sentence').remove()
-        });
-        $(document).on("mouseenter", ".all_sentence_address", function (e) {
-            $('.all_sentence_address').remove()
-        });
-        $(document).on("mouseenter", ".all_sentence_set", function (e) {
-            $('.all_sentence_set').remove()
-        });
+        //
+        // $(document).on("mouseenter", ".place_detail_facility", function (e) {
+        //     $('.' + e.currentTarget.className).append('<div class="all_sentence">' + $('.' + e.currentTarget.className).text() + '</div>')
+        // });
+        // $(document).on("mouseleave", ".place_detail_facility", function () {
+        //     $('.all_sentence').remove()
+        // });
+        //
+        // $(document).on("mouseenter", ".place_detail_address", function (e) {
+        //     $('.' + e.currentTarget.className).append('<div class="all_sentence_address">' + $('.' + e.currentTarget.className).text() + '</div>')
+        // });
+        // $(document).on("mouseleave", ".place_detail_address", function () {
+        //     $('.all_sentence_address').remove()
+        // });
+        //
+        // $(document).on("mouseenter", ".place_detail_set", function (e) {
+        //     $('.' + e.currentTarget.className).append('<div class="all_sentence_set">' + $('.' + e.currentTarget.className).text() + '</div>')
+        // });
+        // $(document).on("mouseleave", ".place_detail_set", function () {
+        //     $('.all_sentence_set').remove()
+        // });
+        //
+        // $(document).on("mouseenter", ".all_sentence", function (e) {
+        //     $('.all_sentence').remove()
+        // });
+        // $(document).on("mouseenter", ".all_sentence_address", function (e) {
+        //     $('.all_sentence_address').remove()
+        // });
+        // $(document).on("mouseenter", ".all_sentence_set", function (e) {
+        //     $('.all_sentence_set').remove()
+        // });
 
         $(function () {
             const STARTZOOMLEVEL = 17
@@ -65,13 +65,7 @@ $(document).on("turbolinks:load", function() {
                             let latitude = data.latitude
                             let longitude = data.longitude
                             let map = callback(latitude, longitude)
-                            //TODO モックデータ
-                            console.log(gon.aed_inf)
-                            coordinateArray = [{
-                                'latitude': latitude,
-                                'longitude': longitude
-                            }, {'latitude': latitude + 0.001, 'longitude': longitude + 0.001}]
-                            circleAbleAED(map, coordinateArray)
+                            circleAbleAED(map, gon.aed_inf)
                         },
                         function (error) {
                             var errorInfo = [
@@ -109,14 +103,16 @@ $(document).on("turbolinks:load", function() {
             }
 
             function circleAbleAED(map, coordinateArray) {
-                let markers = L.markerClusterGroup();
+                let markers = L.markerClusterGroup()
                 coordinateArray.forEach(function (coordinateList, index) {
                     //マーカー表示
-                    let marker = L.marker([coordinateList['latitude'], coordinateList['longitude']]).addTo(map).bindPopup("<div class=marker" + index + ">読み込み中...</div>")
+                    let marker = L.marker([coordinateList['latitude'], coordinateList['longitude']])
+                    marker.bindPopup("<div class=marker" + index + ">読み込み中...</div>")
                     markers.addLayer(marker)
                     let clickEvent = marker.on('click', function (e) {
                         clickEvt(e);
                     })
+                    //ポップアップに情報付加
                     clickEvent.className = "marker" + index;
                     clickEvent.latitude = coordinateList['latitude']
                     clickEvent.longitude = coordinateList['longitude']
@@ -125,7 +121,7 @@ $(document).on("turbolinks:load", function() {
                     let circle = L.circleMarker([coordinateList['latitude'], coordinateList['longitude']], {
                         radius: LIMITRADIUS * map.getZoomScale(STARTZOOMLEVEL, 18),
                         fillColor: 'blue',
-                        fillOpacity: 0.5,
+                        fillOpacity: 0.2,
                         stroke: ""
                     }).addTo(map)
                     //スケールに応じて円の大きさを調整
@@ -145,7 +141,7 @@ $(document).on("turbolinks:load", function() {
 
                         }).done(function (data) {
                             $('.' + e.target.className).text("")
-                            $('.' + e.target.className).append('<img src=' + data['image'] + ' width="200" height="200" class="place_image">');
+                            $('.' + e.target.className).append('<img src=' + data['image'] + ' width="268" height="201" class="place_image">');
                             $('.' + e.target.className).css({
                                 'width': '550px',
                                 'height': '270px',
@@ -154,14 +150,14 @@ $(document).on("turbolinks:load", function() {
                             $('.' + e.target.className).append('' +
 
                                 '<h3 class="margin0">施設名</h3>' +
-                                '<div class="place_detail_facility">テストテストテストテストテストテストテストテストテストテスト</div>' +
+                                '<div class="place_detail_facility">'+ data["aed"]["facility"] +'</div>' +
                                 '<div class="place_detail">' +
                                 '<h3 class="margin0">設置場所</h3>' +
-                                '<div class="place_detail_set">テストテストテストテストテストテストテスト</div>' +
+                                '<div class="place_detail_set">'+ data["aed"]["installation_location"] +'</div>' +
                                 '<h3 class="margin0">住所</h3>' +
-                                '<div class="place_detail_address">テストテストテストテストテストテストテストテスト</div>' +
-                                '<div class="inline-block tel-title">電話番号</div><div class="inline-block tel-num">077777777</div><br>' +
-                                '<div class="inline-block create-title">投稿日</div><div class="inline-block create-at">077777777</div><br>' +
+                                '<div class="place_detail_address">'+ data["aed"]["address"] +'</div>' +
+                                '<div class="inline-block tel-title">電話番号</div><div class="inline-block tel-num">'+ data["aed"]["phone_number"] +'</div><br>' +
+                                '<div class="inline-block create-title">投稿日</div><div class="inline-block create-at">'+ data["created_at"] +'</div><br>' +
 
                                 '</div>')
 

@@ -39,7 +39,8 @@
 .place_detail{
     position: absolute;
     top: -5px;
-    left: 205px;
+    left: 273px;
+    width: 290px;
 }
 
 .margin0{
@@ -52,7 +53,7 @@
 
 .place_detail_set{
     margin-left: 10px;
-    width: 320px;
+    width: 280px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -60,7 +61,7 @@
 
 .place_detail_address{
     margin-left: 10px;
-    width: 320px;
+    width: 280px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -130,13 +131,13 @@
 }
 
 .tel-num{
-    width: 230px;
+    width: 180px;
     text-align: right;
 }
 
 .create-at{
     text-align: right;
-    width: 250px;
+    width: 200px;
 }
 
 /*クラスター用*/
