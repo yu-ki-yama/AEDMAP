@@ -1,0 +1,2 @@
+module AedInformationManagementsHelper
+end
