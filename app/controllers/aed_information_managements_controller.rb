@@ -1,6 +1,6 @@
 class AedInformationManagementsController < ApplicationController
   def index
-
+    @unauthorized_inf = AedInformation.where(registration_status: false)
   end
 
   def create
@@ -22,4 +22,125 @@ class AedInformationManagementsController < ApplicationController
 
     redirect_to aed_information_managements_path
   end
+
+  def csv_import
+
+  end
+
+  def edit
+    if request.xhr?
+      if params['mode'] == "position"
+        query = params['search_word']
+        base_url = 'https://map.yahooapis.jp/search/local/V1/localSearch'
+        request = {
+            'appid' => ENV['YAHOO_CLIENT_ID'],
+            'query' => query,
+            'results' => 100,
+            'detail' => 'full',
+            'output' => 'json'
+        }
+        url = base_url + '?' + URI.encode_www_form(request)
+        json = open(url).read
+        data = JSON.parse(json)
+        @response = []
+        data['Feature'].each do |feature|
+          latitude = feature['Geometry']['Coordinates'].split(",")[1].to_f
+          longitude = feature['Geometry']['Coordinates'].split(",")[0].to_f
+          @response.push({name: feature['Name'] , geometry: [latitude, longitude]})
+        end
+
+      elsif params['mode'] == 'address'
+
+        #緯度経度から住所取得
+        base_url = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder'
+        request = {
+            'appid' => ENV['YAHOO_CLIENT_ID'],
+            'lat' => params['search_latlon'][0],
+            'lon' => params['search_latlon'][1],
+            'output' => 'json'
+        }
+        url = base_url + '?' + URI.encode_www_form(request)
+        json = open(url).read
+        data = JSON.parse(json)
+
+        prefecture = data['Feature'][0]['Property']['AddressElement'][0]['Name']
+        address = data['Feature'][0]['Property']['Address'].split(prefecture)[1]
+        # @response = {prefecture: prefecture, address: address}
+
+        #住所から郵便番号取得
+        base_url = 'https://zipcoda.net/api'
+        request = {
+            'address' => data['Feature'][0]['Property']['Address']
+        }
+        url = base_url + '?' + URI.encode_www_form(request)
+        json = open(url).read
+        data = JSON.parse(json)
+
+        @response = {prefecture: prefecture, address: address, zipcode: data['items'][0]['zipcode']}
+
+      elsif params['mode'] == 'latlon'
+        base_url = 'https://map.yahooapis.jp/geocode/V1/geoCoder'
+        request = {
+            'appid' => ENV['YAHOO_CLIENT_ID'],
+            'query' => params['search_address'],
+            'output' => 'json'
+        }
+        url = base_url + '?' + URI.encode_www_form(request)
+        json = open(url).read
+        data = JSON.parse(json)
+        lonlat = data['Feature'][0]['Geometry']['Coordinates'].split(',')
+        @response = {lon: lonlat[0], lat: lonlat[1]}
+
+      end
+
+    else
+      # @aed_inf = AedInformation.find(params['id'].to_i)
+      @aed_inf = AedInformation.find(39)
+      gon.aed_inf = @aed_inf
+
+      if @aed_inf['business_day'].nil?
+        @business = %w("0" "0" "0" "0" "0" "0" "0" "0")
+      else
+        @business = @aed_inf['business_day'].chars
+      end
+    end
+
+
+  end
+
+  def update
+
+    business = ""
+    is_zero = true
+    8.times do |i|
+      aed_update_params['business_day'].each do |check_num|
+        if i.to_s == check_num
+          business = business + "1"
+          is_zero = false
+          break
+        end
+      end
+      if is_zero
+        business = business + "0"
+      else
+        is_zero = true
+      end
+    end
+
+    update_prams = aed_update_params
+    update_prams['registration_status'] = true
+    update_prams['business_day'] = business
+
+    AedInformation.find(params['id']).update(update_prams)
+    redirect_to aed_information_managements_path
+  end
+
+  private
+  def aed_update_params
+    params.require(:aed_information).permit(:latitude, :longitude, :facility,
+                                            :installation_location, :postal_code,
+                                            :prefecture, :address, :phone_number,
+                                            :installation_date, :start_time, :end_time, :expiration_date, business_day: [])
+  end
+ 
 end

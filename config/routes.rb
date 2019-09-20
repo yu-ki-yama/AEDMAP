@@ -11,5 +11,8 @@ Rails.application.routes.draw do
     get 'about', :on => :collection
   end
 
-  resources :aed_information_managements
+  resources :aed_information_managements do
+    get 'csv_import', :on => :collection
+  end
+
 end

@@ -1,5 +1,4 @@
-<h1>index</h1>
-<%= form_with url: aed_information_managements_path, local: true, method: :post do |form| %>
-  <%= form.file_field :file %>
-  <%= form.submit 'インポート' %>
+<% @unauthorized_inf.each do |aed_inf| %>
+  <div><%= aed_inf['created_at'].strftime('%Y/%m/%d') %><%= aed_inf['facility'] %></div>
+  <%= link_to "編集", edit_aed_information_management_path(aed_inf['id']) %>
 <% end %>

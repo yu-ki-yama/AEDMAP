@@ -251,3 +251,26 @@ nav li{
     width: 600px;
     height: 480px;
 }
+
+/*--------------------*/
+.aed_inf_view{
+    position: relative;
+}
+
+#editMap{
+    height: 480px;
+    width: 600px;
+    z-index: 1;
+}
+
+.aed_inf_view_image{
+    height: 480px;
+    width: 600px;
+    position: absolute;
+    left: 600px;
+    top: 0;
+}
+
+#editMap > div > .leaflet-popup-pane > div > .leaflet-popup-content-wrapper{
+    width: 500px;
+}

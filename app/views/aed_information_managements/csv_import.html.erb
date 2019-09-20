@@ -1,0 +1,4 @@
+<%= form_with url: aed_information_managements_path, local: true, method: :post do |form| %>
+  <%= form.file_field :file %>
+  <%= form.submit 'インポート' %>
+<% end %>

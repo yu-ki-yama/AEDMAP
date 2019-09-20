@@ -18,3 +18,6 @@ module AEDMAP
     # the framework and any gems in your application.
   end
 end
+
+# config.time_zone = 'Tokyo'
+# config.active_record.time_zone_aware_types = [:datetime, :time]
