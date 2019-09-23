@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   resources :maps do
     get 'about', :on => :collection
+    get 'download', :on => :collection
   end
 
   resources :aed_information_managements do

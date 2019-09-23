@@ -44,6 +44,17 @@ class MapsController < ApplicationController
     @aed_inf = AedInformation.all
   end
 
+  def download
+    respond_to do |format|
+      format.html do
+
+      end
+      format.csv do
+        send_data render_to_string, filename: "投稿情報.csv"
+      end
+    end
+  end
+
   private
 
   def aed_params

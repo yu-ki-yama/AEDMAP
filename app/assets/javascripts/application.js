@@ -50,8 +50,8 @@ $(document).on("turbolinks:load", function() {
         //     $('.all_sentence_set').remove()
         // });
         $(function () {
-            const STARTZOOMLEVEL = 17
-            const LIMITRADIUS = 800
+            const STARTZOOMLEVEL = 18
+            const LIMITRADIUS = 400
 
             function getCoordinate(callback) {
                 //ユーザーの端末がGeoLocation APIに対応しているかの判定
@@ -91,7 +91,7 @@ $(document).on("turbolinks:load", function() {
             //map生成
             function mapInit(latitude, longitude) {
                 //地図の初期設定
-                let map = L.map('map').setView([latitude, longitude], STARTZOOMLEVEL);
+                let map = L.map('map',{minZoom:6}).setView([latitude, longitude], STARTZOOMLEVEL);
                 //地図のタイル設定
                 L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'
@@ -104,9 +104,14 @@ $(document).on("turbolinks:load", function() {
             //AED適用可能範囲の円と設置場所のポップアップ表示
             function circleAbleAED(map, coordinateArray) {
                 let markers = L.markerClusterGroup()
+                //全マーカー作成
                 coordinateArray.forEach(function (coordinateList, index) {
                     //マーカー表示
-                    let marker = L.marker([coordinateList['latitude'], coordinateList['longitude']])
+                    let marker = L.marker([coordinateList['latitude'], coordinateList['longitude']],{icon: L.icon({
+                            iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                            className: `leaflet-marker-icon-color-white marker${index}-img`
+                        })
+                    })
                     marker.bindPopup("<div class=marker" + index + ">読み込み中...</div>")
                     markers.addLayer(marker)
                     let clickEvent = marker.on('click', function (e) {
@@ -127,12 +132,19 @@ $(document).on("turbolinks:load", function() {
                     //スケールに応じて円の大きさを調整
                     map.on('zoomend', function () {
                         let currentZoomLevel = map.getZoom()
-                        circle.setRadius(LIMITRADIUS * map.getZoomScale(currentZoomLevel, 18))
+                        circle.setRadius(LIMITRADIUS * map.getZoomScale(currentZoomLevel, 17))
+
+                        //ピンの位置がずれるため独自のスケールを適用して調整
+                        scale = {"18":0,"17":2,"16":6,"15":12,"14":24,"13":48,"12":96,"11":220,"10":440,"9":880,"8":1760,"7":3520,"6":7040}
+                        marker.setLatLng(new L.LatLng( coordinateList['latitude']+0.00009 * scale[currentZoomLevel], coordinateList['longitude']-0.00004* scale[currentZoomLevel]))
                     })
 
                     //ポップアップをクリックした時のイベント
                     function clickEvt(e) {
+                        console.log([e.target.latitude, e.target.longitude])
                         map.setView([e.target.latitude, e.target.longitude])
+                        console.log(e.target.className)
+                        $(`.${e.target.className}-img`).removeClass('leaflet-marker-icon-color-white')
                         $.ajax({
                             type: 'GET',
                             url: '/maps',
@@ -163,7 +175,11 @@ $(document).on("turbolinks:load", function() {
                         })
                     }
                 })
+                //マップにマーカー情報反映
                 map.addLayer(markers)
+                map.on('dblclick', function(e) {
+                    console.log([e.latlng.lat, e.latlng.lng])
+                } )
             }
 
             getCoordinate(mapInit)
