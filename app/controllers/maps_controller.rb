@@ -1,11 +1,9 @@
 class MapsController < ApplicationController
   def index
     if request.xhr?
-      puts '-----------'
-      puts params['className'].split('marker')[1].to_i+1
       @aed_inf = AedInformation.find(params['className'].split('marker')[1].to_i+1)
 
-      if @aed_inf['aed_image_id'] == ''
+      if @aed_inf['aed_image_id'] == '' || !@aed_inf['registration_status']
         @image = helpers.asset_url("noimage.png")
       else
         @image = Refile.attachment_url(@aed_inf, :aed_image, :fill, 268, 201, format: "jpeg")
@@ -13,10 +11,17 @@ class MapsController < ApplicationController
 
       @created_at = @aed_inf['created_at'].strftime('%Y/%m/%d')
 
+      # 認証前のデータを改変
+      unless @aed_inf['registration_status']
+          @aed_inf["facility"] = '未承認'
+          @aed_inf["installation_location"] = '未承認'
+          @aed_inf["address"] = '未承認'
+          @aed_inf["phone_number"] = '未承認'
+      end
+
       if @aed_inf['phone_number'].nil?
         @aed_inf['phone_number'] = '未登録'
       end
-
       if @aed_inf['address'].nil?
         @aed_inf['address'] = '未登録'
       end
@@ -56,7 +61,6 @@ class MapsController < ApplicationController
   end
 
   private
-
   def aed_params
     params.require(:aed_information).permit(:latitude, :aed_image, :longitude, :facility, :installation_location, :image_url)
   end

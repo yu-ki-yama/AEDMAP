@@ -1,39 +1,62 @@
-<% date_array = %w(月 火 水 木 金 土 日 祝日) %>
-<div class="aed_inf_view">
-  <div id="editMap"></div>
-  <div class="aed_inf_view_image">
-    <%if @aed_inf['aed_image_id'] == "" %>
-      <%= image_tag '/noimage.png', style: 'width:600; height:480px;' %>
-    <% else %>
-      <%= attachment_image_tag @aed_inf, :aed_image, :fill, 600, 480, format: 'jpeg' %>
-    <% end %>
+<div class="admin_header">
+    <%= link_to '投稿情報一覧', aed_information_managements_path,class: 'admin_header_list btn btn-primary' %>
+    <%= link_to 'CSVインポート', csv_import_aed_information_managements_path, class: 'admin_header_import btn btn-primary' %>
+</div>
 
+<% date_array = %w(月 火 水 木 金 土 日 祝日) %>
+<div class="edit_form">
+  <div class="aed_inf_view">
+    <div id="editMap"></div>
+    <div class="aed_inf_view_image">
+      <%if @aed_inf['aed_image_id'] == "" %>
+        <%= image_tag '/noimage.png', style: 'width:600; height:480px;' %>
+      <% else %>
+        <%= attachment_image_tag @aed_inf, :aed_image, :fill, 800, 680, format: 'jpeg' %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="aed_edit_form">
+    <%= form_with model: @aed_inf,url: aed_information_management_path, method: :patch,local: true do |form| %>
+
+      <h3>位置情報</h3>
+      <div class="edit_form_position">
+        <p class="edit_latlng">緯度 <%= form.text_field :latitude %> 経度 <%= form.text_field :longitude %>  <input type="button" class="search_latlon_submit btn btn-primary" value="住所から検索"></p>
+        <p>施設名 <%= form.text_field :facility %> 設置場所 <%= form.text_field :installation_location %></p>
+        <p>郵便番号 <%= form.text_field :postal_code %> 都道府県 <%= form.text_field :prefecture %> 住所 <%= form.text_field :address %> <input type="button" class="search_address_submit btn btn-primary" value="緯度経度から検索"></p>
+      </div>
+
+      <h3>施設情報</h3>
+      <div class="edit_form_facility_detail">
+        <p>設置日 <%= form.date_field :installation_date %> 有効期限 <%= form.date_field :expiration_date %></p>
+        <p>営業開始時間 <%= form.time_field :start_time %> 営業終了時間 <%= form.time_field :end_time %></p>
+        <p>電話番号 <%= form.text_field :phone_number %></p>
+        <p>
+          営業日
+          <% @business.each_with_index do |check, i| %>
+            <% if check == "1" %>
+              <%= form.check_box :business_day, {multiple: true, :checked => true}, i, nil %>
+            <% else %>
+              <%= form.check_box :business_day, {multiple: true}, i, nil %>
+            <% end %>
+            <%= label_tag :business_day, date_array[i] %>
+          <% end %>
+        </p>
+      </div>
+
+      <div class="edit-submit-btns">
+        <%= form.submit '更新',class: 'edit-submit-btn btn btn-primary' %>
+        <%= link_to '削除',aed_information_management_path , class: 'edit-delete-btn btn btn-danger',method: :delete %>
+      </div>
+
+    <% end %>
   </div>
 </div>
 
-<%= form_with model: @aed_inf,url: aed_information_management_path, method: :patch,local: true do |form| %>
-  <p>緯度<%= form.text_field :latitude %>経度<%= form.text_field :longitude %><input type="button" class="search_latlon_submit" value="住所から検索"><input type="button" class="search_modification_latlon_submit" value="修正マーカーの位置を適用"></p>
-  <p>施設名<%= form.text_field :facility %>設置場所<%= form.text_field :installation_location %></p>
-  <p>郵便番号<%= form.text_field :postal_code %>都道府県<%= form.text_field :prefecture %>住所<%= form.text_field :address %><input type="button" class="search_address_submit" value="緯度経度から検索"></p>
-  <p>設置日 <%= form.date_field :installation_date %>有効期限<%= form.date_field :expiration_date %></p>
-  <p>営業開始時間<%= form.time_field :start_time %>営業終了時間<%= form.time_field :end_time %></p>
-  <p>電話番号<%= form.text_field :phone_number %></p>
-  <p>
-    営業日
-    <% @business.each_with_index do |check, i| %>
-      <% if check == "1" %>
-        <%= form.check_box :business_day, {multiple: true, :checked => true}, i, nil %>
-      <% else %>
-        <%= form.check_box :business_day, {multiple: true}, i, nil %>
-      <% end %>
-      <%= label_tag :business_day, date_array[i] %>
-    <% end %>
-  </p>
 
+<div class="search_position_form">
+  <input type="text" class="search_position">
+  <input type="button" class="search_position_submit btn btn-primary" value="施設名から検索">
+</div>
 
-  <%= form.submit '送信' %>
-<% end %>
-
-<input type="text" class="search_position">
-<input type="button" class="search_position_submit" value="施設名から検索">
-
+<input type="button" class="search_modification_latlon_submit btn btn-danger" value="修正マーカーの位置を適用">

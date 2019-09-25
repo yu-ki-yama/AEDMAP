@@ -1,0 +1,13 @@
+$(".admin_top_main").html('<%= escape_javascript(render("main_content", aed_inf_array: @aed_inf)) %>')
+$(".state_select_btn > a").removeClass()
+
+<% if @select_mode == '未承認' %>
+  $(".state_select_btn > a:nth-child(1)").addClass('btn btn-danger')
+  $(".state_select_btn > a:last-child").addClass('btn btn-light btn_border')
+  $('.prefecture-select').css("display","none")
+<% elsif @select_mode == '承認済' %>
+  $(".state_select_btn > a:nth-child(1)").addClass('btn btn-light btn_border')
+  $(".state_select_btn > a:last-child").addClass('btn btn-danger')
+  $('.prefecture-select').css("display","block")
+<% end %>
+

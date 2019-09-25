@@ -1,0 +1,40 @@
+<div class="header">
+  <div class="menu-trigger-form" href=""><span></span><span></span><span></span></div>
+  <div class="menu-trigger-back-form"></div>
+  <nav>
+    <ul class="menu-btns">
+      <li><%= link_to 'AEDMAP', maps_path,class: 'btn btn-success' %></li>
+      <li><%= link_to 'サイトについて', about_maps_path, class: 'btn btn-success'%></li>
+      <li><%= link_to '投稿', new_map_path, class: 'btn btn-success' %></li>
+      <li><%= link_to 'ダウンロード', download_maps_path, class: 'btn btn-success' %></li>
+    </ul>
+  </nav>
+  <div class="overlay"></div>
+</div>
+
+<div class="about_main_content">
+  <h2>AEDMAPの注意事項</h2>
+  <p>投稿型のAEDの位置マッピングサイトになっています</p>
+  <p>投稿の際やマップ表示には位置情報を使用しています</p>
+  <p>閲覧ご協力いただく際は位置情報の許可をお願いします</p>
+  <p>また投稿の際は位置情報の他に端末のカメラ機能を使用します</p>
+
+  <h2>AEDMAPとは？</h2>
+  <p>青色のエリアはAEDの位置を中心に半径400メートルの範囲を示しています</p>
+  <p>救急車到着までに往復しても適用できる限界の距離として参考表示しています</p>
+  <p>青色のマーカーは管理者が承認したAEDの情報になります</p>
+  <p>赤色のマーカーは管理者がまだ承認していないAEDの情報になります</p>
+  <p>マーカーを選択していただくとAEDの詳細情報が表示されます</p>
+
+  <h2>投稿について</h2>
+  <p>気軽に投稿してもらうために必要事項は以下の4点に絞っています</p>
+  <p>カメラ機能を許可してAEDが設置されている場所を撮影してください</p>
+  <p>場所の特定のため位置情報を許可してください</p>
+  <p>施設の名前がわかればできる限り詳しくお願いします</p>
+  <p>設置されている場所の詳細をお願いします</p>
+
+  <h2>ダウンロードについて</h2>
+  <p>集まった情報は承認された写真データを除く全ての情報を公開しております</p>
+  <p>興味のある方はダウンロードしてご利用ください</p>
+  <p>投稿型のサイトのため空のデータが複数ある場合がございます</p>
+</div>

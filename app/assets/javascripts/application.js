@@ -104,14 +104,25 @@ $(document).on("turbolinks:load", function() {
             //AED適用可能範囲の円と設置場所のポップアップ表示
             function circleAbleAED(map, coordinateArray) {
                 let markers = L.markerClusterGroup()
+                let clickOnMarkerClass = ""
                 //全マーカー作成
                 coordinateArray.forEach(function (coordinateList, index) {
+                    let marker = ""
                     //マーカー表示
-                    let marker = L.marker([coordinateList['latitude'], coordinateList['longitude']],{icon: L.icon({
-                            iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
-                            className: `leaflet-marker-icon-color-white marker${index}-img`
+                    if(coordinateList['registration_status']){
+                        marker = L.marker([coordinateList['latitude'], coordinateList['longitude']],{icon: L.icon({
+                                iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                                className: `marker${index}-img`
+                            })
                         })
-                    })
+                    }else {
+                        marker = L.marker([coordinateList['latitude'], coordinateList['longitude']],{icon: L.icon({
+                                iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                                className: `marker${index}-img leaflet-marker-icon-color-red`
+                            })
+                        })
+                    }
+
                     marker.bindPopup("<div class=marker" + index + ">読み込み中...</div>")
                     markers.addLayer(marker)
                     let clickEvent = marker.on('click', function (e) {
@@ -121,7 +132,6 @@ $(document).on("turbolinks:load", function() {
                     clickEvent.className = "marker" + index;
                     clickEvent.latitude = coordinateList['latitude']
                     clickEvent.longitude = coordinateList['longitude']
-
                     //円で塗りつぶし
                     let circle = L.circleMarker([coordinateList['latitude'], coordinateList['longitude']], {
                         radius: LIMITRADIUS * map.getZoomScale(STARTZOOMLEVEL, 18),
@@ -131,8 +141,12 @@ $(document).on("turbolinks:load", function() {
                     }).addTo(map)
                     //スケールに応じて円の大きさを調整
                     map.on('zoomend', function () {
+                        //サークルの大きさをスケールに合わして調整
                         let currentZoomLevel = map.getZoom()
                         circle.setRadius(LIMITRADIUS * map.getZoomScale(currentZoomLevel, 17))
+
+                        //ポップアップを閉じる
+                        map.closePopup()
 
                         //ピンの位置がずれるため独自のスケールを適用して調整
                         scale = {"18":0,"17":2,"16":6,"15":12,"14":24,"13":48,"12":96,"11":220,"10":440,"9":880,"8":1760,"7":3520,"6":7040}
@@ -141,10 +155,15 @@ $(document).on("turbolinks:load", function() {
 
                     //ポップアップをクリックした時のイベント
                     function clickEvt(e) {
-                        console.log([e.target.latitude, e.target.longitude])
+                        //マーカーの色をクリックされた時のものに変更
+                        if(clickOnMarkerClass !== ""){
+                            $(clickOnMarkerClass).removeClass('leaflet-marker-icon-color-white')
+                        }
+                        clickOnMarkerClass = `.${e.target.className}-img`
                         map.setView([e.target.latitude, e.target.longitude])
-                        console.log(e.target.className)
-                        $(`.${e.target.className}-img`).removeClass('leaflet-marker-icon-color-white')
+                        $(clickOnMarkerClass).addClass('leaflet-marker-icon-color-white')
+
+                        //クリックされたマーカーの情報を取得
                         $.ajax({
                             type: 'GET',
                             url: '/maps',
@@ -175,15 +194,15 @@ $(document).on("turbolinks:load", function() {
                         })
                     }
                 })
+                //ポップアップを閉じときに色を変更
+                map.on('popupclose', function() {
+                    $(clickOnMarkerClass).removeClass('leaflet-marker-icon-color-white')
+                    clickOnMarkerClass = ""
+                })
                 //マップにマーカー情報反映
                 map.addLayer(markers)
-                map.on('dblclick', function(e) {
-                    console.log([e.latlng.lat, e.latlng.lng])
-                } )
             }
-
             getCoordinate(mapInit)
-
         })
     }
 
@@ -224,12 +243,11 @@ $(document).on("turbolinks:load", function() {
                     "timeout": 8000,
                     "maximumAge": 2000
                 })
-
             } else {
                 var errorMessage = "お使いの端末は、GeoLacation APIに対応していません。"
                 alert(errorMessage)
             }
-
+            //カメラの撮影
             $('#shutter').on('click',function(){
                 var canvas = document.getElementById('canvas');
                 var ctx = canvas.getContext('2d');
@@ -246,29 +264,56 @@ $(document).on("turbolinks:load", function() {
                 localstream.getTracks()[0].enabled = false;
                 $('#shutter').css("display","none")
                 $('#retry').css("display","inline-block")
+                $('#aed_inf_confirm').css("display","inline-block")
                 $('#video').css("display","none")
-            });
 
-            $('#retry').on('click',function(){
-                localstream.getTracks()[0].enabled = true;
-                $('#shutter').css("display","inline-block")
-                $('#retry').css("display","none")
-                $('#video').css("display","block")
-                $('#image').removeAttr('src');
-            });
 
-            $('#aed_inf_confirm').on('click',function(){
-                let canvas = document.getElementById("canvas")
-                //Base64は先頭のminetype(data:image/png;base64,の部分）は不要なため削除
-                let canvas_data = canvas.toDataURL("image/jpeg").replace(/^.*,/, '')
-                $("#aed_information_image_url").val(canvas_data)
-                $('#aed_inf_form').submit()
+                $('#retry').on('click',function(){
+                    localstream.getTracks()[0].enabled = true;
+                    $('#shutter').css("display","inline-block")
+                    $('#retry').css("display","none")
+                    $('#video').css("display","block")
+                    $('#image').removeAttr('src');
+                    $('#aed_inf_confirm').css("display","none")
+                });
+
+                $('#aed_inf_confirm').on('click',function(){
+                    let canvas = document.getElementById("canvas")
+                    //Base64は先頭のminetype(data:image/png;base64,の部分）は不要なため削除
+                    let canvas_data = canvas.toDataURL("image/jpeg").replace(/^.*,/, '')
+                    $("#aed_information_image_url").val(canvas_data)
+                    $('#aed_inf_form').submit()
+                })
             })
         })
     }
-
+    //ハンバーガメニュー操作
     $(function() {
         $('.menu-trigger').on('click',function(){
+            if($(this).hasClass('active')){
+                $(this).removeClass('active')
+                $('main').removeClass('open')
+                $('nav').removeClass('open')
+                $('.overlay').removeClass('open')
+            } else {
+                $(this).addClass('active')
+                $('main').addClass('open')
+                $('nav').addClass('open')
+                $('.overlay').addClass('open')
+            }
+        })
+        $('.overlay').on('click',function(){
+            if($(this).hasClass('open')){
+                $(this).removeClass('open')
+                $('.menu-trigger').removeClass('active')
+                $('main').removeClass('open')
+                $('nav').removeClass('open')
+            }
+        })
+    })
+    //ハンバーガメニュー操作
+    $(function() {
+        $('.menu-trigger-form').on('click',function(){
             if($(this).hasClass('active')){
                 $(this).removeClass('active')
                 $('main').removeClass('open')
@@ -294,14 +339,26 @@ $(document).on("turbolinks:load", function() {
     if($('#editMap').length) {
         let STARTZOOMLEVEL = 18
         let map = mapInit(gon.aed_inf['latitude'], gon.aed_inf['longitude'])
-        let marker = L.marker([gon.aed_inf['latitude'], gon.aed_inf['longitude']]).addTo(map)
+        let marker = L.marker([gon.aed_inf['latitude'], gon.aed_inf['longitude']],{icon: L.icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                className: 'leaflet-marker-icon-color-green'
+            })}).addTo(map)
         let modification_marker = L.marker([gon.aed_inf['latitude'], gon.aed_inf['longitude']])
         let search_markers
         //緯度経度修正マーカーを設置
         map.on('dblclick', function(e) {
             map.removeLayer(modification_marker)
-            modification_marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-        } )
+            modification_marker = L.marker([e.latlng.lat, e.latlng.lng],{icon: L.icon({
+                    iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                    className: 'leaflet-marker-icon-color-red'
+                })}).addTo(map)
+            modification_marker.on('click', function (e) {
+                map.setView([e.latlng.lat, e.latlng.lng], 18)
+            })
+        })
+        marker.on('click', function (e) {
+            map.setView([e.latlng.lat, e.latlng.lng], 18)
+        })
         //施設名から候補をマーカー表示
         $('.search_position_submit').on('click',function(){
             $('.search_position').val()
@@ -331,64 +388,82 @@ $(document).on("turbolinks:load", function() {
                 alert('情報の取得に失敗しました')
             })
         })
-
         //緯度経度から郵便番号と住所を検索
         $('.search_address_submit').on('click',function(){
-            $.ajax({
-                type: 'GET',
-                url: location.pathname,
-                data: {search_latlon: [$('#aed_information_latitude').val(), $('#aed_information_longitude').val()], mode: "address"},
-                dataType: 'json'
-            }).done(function (data) {
-                if(window.confirm(`〒　　　　${data['response']['zipcode']}\n都道府県　${data['response']['prefecture']}\n住所　　　${data['response']['address']}`)) {
-                    $('#aed_information_postal_code').val(data['response']['zipcode'])
-                    $('#aed_information_prefecture').val(data['response']['prefecture'])
-                    $('#aed_information_address').val(data['response']['address'])
-                }else{
-                    alert('情報の反映をキャンセルしました')
-                }
+            if($('#aed_information_latitude').val() === "" || $('#aed_information_longitude').val() === "" ){
+                alert('緯度か経度の値が空です')
+            }else{
+                $.ajax({
+                    type: 'GET',
+                    url: location.pathname,
+                    data: {search_latlon: [$('#aed_information_latitude').val(), $('#aed_information_longitude').val()], mode: "address"},
+                    dataType: 'json'
+                }).done(function (data) {
+                    if(window.confirm(`〒　　　　${data['response']['zipcode']}\n都道府県　${data['response']['prefecture']}\n住所　　　${data['response']['address']}`)) {
+                        $('#aed_information_postal_code').val(data['response']['zipcode'])
+                        $('#aed_information_prefecture').val(data['response']['prefecture'])
+                        $('#aed_information_address').val(data['response']['address'])
+                    }else{
+                        alert('情報の反映をキャンセルしました')
+                    }
 
-            }).fail(function () {
-                alert('情報の取得に失敗しました')
-            })
+                }).fail(function () {
+                    alert('情報の取得に失敗しました')
+                })
+            }
         })
-
         //住所から緯度経度を検索
         $('.search_latlon_submit').on('click',function(){
-            $.ajax({
-                type: 'GET',
-                url: location.pathname,
-                data: {search_address: $('#aed_information_prefecture').val()+$('#aed_information_address').val(), mode: "latlon"},
-                dataType: 'json'
-            }).done(function (data) {
-                map.removeLayer(modification_marker)
-                modification_marker = L.marker([data['response']['lat'], data['response']['lon']]).addTo(map)
-                map.setView([data['response']['lat'], data['response']['lon']], 18)
-                console.log(modification_marker)
-                console.log(marker)
+            if($('#aed_information_address').val() === "" ){
+                alert('住所の値が空です')
+            }else{
+                $.ajax({
+                    type: 'GET',
+                    url: location.pathname,
+                    data: {search_address: $('#aed_information_prefecture').val()+$('#aed_information_address').val(), mode: "latlon"},
+                    dataType: 'json'
+                }).done(function (data) {
+                    map.removeLayer(modification_marker)
+                    modification_marker = L.marker([data['response']['lat'], data['response']['lon']]).addTo(map)
+                    map.setView([data['response']['lat'], data['response']['lon']], 18)
 
-            }).fail(function () {
-                alert('情報の取得に失敗しました')
-            })
+                }).fail(function () {
+                    alert('情報の取得に失敗しました')
+                })
+            }
         })
-
         //修正マーカーの位置にマーカーを設定
         $('.search_modification_latlon_submit').on('click',function(){
-            let lat = modification_marker['_latlng']['lat']
-            let lon = modification_marker['_latlng']['lng']
-            map.setView([lat, lon], 18)
-            setTimeout(function(){
-                if(window.confirm('マーカーの位置と緯度経度を修正しますがよろしいでしょうか？')) {
-                    map.removeLayer(modification_marker)
-                    map.removeLayer(marker)
-                    marker = L.marker([lat, lon]).addTo(map)
-                    $('#aed_information_latitude').val(lat)
-                    $('#aed_information_longitude').val(lon)
-                }else{
-                    alert('情報の反映をキャンセルしました')
-                }
-            }, 1500);
-
+            console.log(modification_marker)
+            if(modification_marker["_latlng"]["lat"] === marker["_latlng"]["lat"] && modification_marker["_latlng"]["lng"] === marker["_latlng"]["lng"]) {
+                alert('修正用のマーカーが存在しません')
+            }else{
+                let lat = modification_marker['_latlng']['lat']
+                let lon = modification_marker['_latlng']['lng']
+                map.setView([lat, lon], 18)
+                setTimeout(function(){
+                    if(window.confirm('マーカーの位置と緯度経度を修正しますがよろしいでしょうか？')) {
+                        map.removeLayer(modification_marker)
+                        map.removeLayer(marker)
+                        marker = L.marker([lat, lon],{icon: L.icon({
+                                iconUrl: 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+                                className: 'leaflet-marker-icon-color-green'
+                            })}).addTo(map)
+                        $('#aed_information_latitude').val(lat)
+                        $('#aed_information_longitude').val(lon)
+                    }else{
+                        alert('情報の反映をキャンセルしました')
+                    }
+                }, 1500);
+            }
+        })
+        //削除確認
+        $('.edit-delete-btn').on('click',function(){
+            if(confirm('本当に削除してもよろしいですか？')){
+            }else{
+                alert('削除しませんでした')
+                return false
+            }
         })
 
         function mapInit(latitude, longitude) {
@@ -402,12 +477,50 @@ $(document).on("turbolinks:load", function() {
             L.control.scale({imperial: false}).addTo(map);
             return map
         }
-
-
-
-
     }
 
+    // アイコンをクリックした場合は、ファイル選択をクリックした挙動とする.
+    $('#file_select_icon').on('click', function() {
+        $('#file_select').click()
+    });
+    // ファイル選択時に表示用テキストボックスへ値を連動させる.
+    $('#file_select').parent().on('change', '#file_select', function() {
+        $('#file_name').val($('#file_select').prop('files')[0].name)
+    });
+    // ファイル選択値をクリア.
+    $('#btn_clear_file').on('click', function() {
+        $('#file_select').html('<input class="form-control" style="display:none" type="file" name="file_select" id="file_select">')
+        $('#file_name').val('')
+    })
+    //　送信ボタン制御
+    $(".import_submit").on('click', function() {
+        if($('#file_name').val() === ""){
+            alert('ファイルが選択されていません')
+            return false
+        }else{
+            return true
+        }
+    })
+    //セレクトボックスで選択時
+    $(".prefecture-select > select").on('change', function() {
+        $.ajax({
+            type: 'GET',
+            url: '/aed_information_managements/search',
+            data: {search_prefecture: $(this).val()},
+            dataType: 'script'
+        }).done(function () {
+        }).fail(function () {
+            alert('情報の取得に失敗しました')
+        })
+    })
+    $(window).resize(function(){
+        if($(window).width() > 735){
+            $('.menu-trigger').removeClass('active')
+            $('main').removeClass('open')
+            $('nav').removeClass('open')
+            $('.overlay').removeClass('open')
+        }
+    })
 })
 
 

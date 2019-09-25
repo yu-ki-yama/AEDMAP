@@ -1,12 +1,25 @@
-<div id="map"></div>
-<div class="menu-trigger" href=""><span></span><span></span><span></span></div>
-<div class="menu-trigger-back"></div>
-<nav>
-  <ul>
-    <li>ホーム</li>
-    <li>AEDMAPについて</li>
-    <li>投稿</li>
-  </ul>
-</nav>
-<div class="overlay"></div>
+<div class="main-map-header">
+  <%= link_to 'AEDMAP', maps_path,class: 'btn btn-success' %>
+  <%= link_to 'サイトについて', about_maps_path, class: 'btn btn-success'%>
+  <%= link_to '投稿', new_map_path, class: 'btn btn-success' %>
+  <%= link_to 'ダウンロード', download_maps_path, class: 'btn btn-success' %>
+</div>
+
+<div class="main-content">
+  <div id="map"></div>
+  <div class="menu-trigger" href=""><span></span><span></span><span></span></div>
+  <div class="menu-trigger-back"></div>
+  <div class="map-header">
+    <nav>
+      <ul class="menu-btns">
+        <li><%= link_to 'AEDMAP', maps_path,class: 'btn btn-success' %></li>
+        <li><%= link_to 'サイトについて', about_maps_path, class: 'btn btn-success'%></li>
+        <li><%= link_to '投稿', new_map_path, class: 'btn btn-success' %></li>
+        <li><%= link_to 'ダウンロード', download_maps_path, class: 'btn btn-success' %></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="overlay"></div>
+</div>
+
 

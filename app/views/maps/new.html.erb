@@ -1,30 +1,52 @@
-<%= form_with model: @aed_inf, url: maps_path, method: :post, local: true, id: "aed_inf_form" do |form| %>
-  <div class="image_field">
-    <canvas id="canvas" style="display: none;"></canvas>
-    <video id="video" autoplay="1"></video>
-    <img id="image">
-
-  </div>
-
-  <div class="name_facility_field">
-    <%= form.text_field :facility %>
-  </div>
-
-  <div class="set_position_field">
-    <%= form.text_field :installation_location %>
-  </div>
-
-  <%= form.attachment_field :aed_image, style: 'display: none'%>
-  <%= form.hidden_field :image_url %>
-  <%= form.hidden_field :latitude %>
-  <%= form.hidden_field :longitude %>
-<% end %>
-
-<div class="image_shutter_btn">
-  <button id="shutter">撮影</button>
-  <button id="retry" style="display: none">取り直し</button>
+<div class="header">
+  <div class="menu-trigger-form" href=""><span></span><span></span><span></span></div>
+  <div class="menu-trigger-back-form"></div>
+  <nav>
+    <ul class="menu-btns">
+      <li><%= link_to 'AEDMAP', maps_path,class: 'btn btn-success' %></li>
+      <li><%= link_to 'サイトについて', about_maps_path, class: 'btn btn-success'%></li>
+      <li><%= link_to '投稿', new_map_path, class: 'btn btn-success' %></li>
+      <li><%= link_to 'ダウンロード', download_maps_path, class: 'btn btn-success' %></li>
+    </ul>
+  </nav>
+  <div class="overlay"></div>
 </div>
 
-<div id="aed_inf_confirm_btn">
-  <button id="aed_inf_confirm">送信</button>
+<div class="form-main-content">
+  <%= form_with model: @aed_inf, url: maps_path, method: :post, local: true, id: "aed_inf_form" do |form| %>
+    <div class="image_field">
+      <canvas id="canvas" style="display: none;"></canvas>
+      <video id="video" autoplay="1"></video>
+      <img id="image">
+    </div>
+
+    <div class="input_field form-group form-group-lg">
+      <div class="name_facility_field">
+        <%= form.label :facility, "施設名" %><br>
+        <%= form.text_field :facility, class: "form-control" %>
+      </div>
+
+      <div class="set_position_field form-group form-group-lg">
+        <%= form.label :installation_location, "設置場所" %><br>
+        <%= form.text_field :installation_location, class: "form-control" %>
+      </div>
+    </div>
+
+    <%= form.attachment_field :aed_image, style: 'display: none'%>
+    <%= form.hidden_field :image_url %>
+    <%= form.hidden_field :latitude %>
+    <%= form.hidden_field :longitude %>
+  <% end %>
+
+  <div class="image_shutter_btn">
+    <button id="shutter">
+      <i class="fa fa-camera fa-5x"></i>
+    </button>
+  </div>
+
+  <button id="retry" style="display: none" class="btn btn-danger">取り直し</button>
+
+  <div id="aed_inf_confirm_btn">
+    <button id="aed_inf_confirm" style="display: none" class="btn btn-primary">送信</button>
+  </div>
 </div>

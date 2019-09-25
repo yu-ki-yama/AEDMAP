@@ -1,10 +1,10 @@
 class AedInformationManagementsController < ApplicationController
   def index
-    @unauthorized_inf = AedInformation.where(registration_status: false)
+      @aed_inf = AedInformation.where(registration_status: false)
   end
 
   def create
-    CSV.read(params[:file].path, headers: true).each do |row|
+    CSV.read(params[:file_select].path, headers: true).each do |row|
       if AedInformation.where(facility: row['施設名']).where(installation_location: row['設置位置']).blank?
         AedInformation.create(
             latitude: row['緯度'],
@@ -21,10 +21,6 @@ class AedInformationManagementsController < ApplicationController
     end
 
     redirect_to aed_information_managements_path
-  end
-
-  def csv_import
-
   end
 
   def edit
@@ -94,8 +90,7 @@ class AedInformationManagementsController < ApplicationController
       end
 
     else
-      # @aed_inf = AedInformation.find(params['id'].to_i)
-      @aed_inf = AedInformation.find(39)
+      @aed_inf = AedInformation.find(params["id"].to_i)
       gon.aed_inf = @aed_inf
 
       if @aed_inf['business_day'].nil?
@@ -104,28 +99,30 @@ class AedInformationManagementsController < ApplicationController
         @business = @aed_inf['business_day'].chars
       end
     end
-
-
   end
 
   def update
-
     business = ""
-    is_zero = true
-    8.times do |i|
-      aed_update_params['business_day'].each do |check_num|
-        if i.to_s == check_num
-          business = business + "1"
-          is_zero = false
-          break
+    if aed_update_params.has_key?('business_day')
+      is_zero = true
+      8.times do |i|
+        aed_update_params['business_day'].each do |check_num|
+          if i.to_s == check_num
+            business = business + "1"
+            is_zero = false
+            break
+          end
+        end
+        if is_zero
+          business = business + "0"
+        else
+          is_zero = true
         end
       end
-      if is_zero
-        business = business + "0"
-      else
-        is_zero = true
-      end
+    else
+      business = "00000000"
     end
+
 
     update_prams = aed_update_params
     update_prams['registration_status'] = true
@@ -133,6 +130,30 @@ class AedInformationManagementsController < ApplicationController
 
     AedInformation.find(params['id']).update(update_prams)
     redirect_to aed_information_managements_path
+  end
+
+  def destroy
+    AedInformation.find(params['id']).destroy
+    redirect_to aed_information_managements_path
+  end
+
+  def csv_import
+  end
+
+  def search
+    @select_mode = params['format']
+    if params['format'] == '承認済'
+      @aed_inf = AedInformation.where(registration_status: true)
+    elsif params['format'] == '未承認'
+      @aed_inf = AedInformation.where(registration_status: false)
+    else
+      @select_mode = '承認済'
+      if params['search_prefecture'] == '全国'
+        @aed_inf = AedInformation.where(registration_status: true)
+      else
+        @aed_inf = AedInformation.where(prefecture: params['search_prefecture'])
+      end
+    end
   end
 
   private

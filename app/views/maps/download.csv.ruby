@@ -21,20 +21,25 @@ CSV.generate do |csv|
   csv << column_name_array
 
   business_index = original_column_names.find_index('business_day').to_i
+  id_index = original_column_names.find_index('id').to_i
   date_array = %w(月 火 水 木 金 土 日 祝日)
   AedInformation.pluck(original_column_names).each do |data|
-    update_data = data
+    if AedInformation.find(data[id_index].to_i)["registration_status"]
 
-    unless data[business_index].nil?
-      date = ''
-      data[business_index].chars.each_with_index do |flag, i|
-        if flag.to_i == 1
-          date = date + date_array[i]
+      update_data = data
+
+      unless data[business_index].nil?
+        date = ''
+        data[business_index].chars.each_with_index do |flag, i|
+          if flag.to_i == 1
+            date = date + date_array[i]
+          end
         end
+        update_data[business_index] = date
       end
-      update_data[business_index] = date
+
+      csv << update_data
     end
 
-    csv << update_data
   end
 end

@@ -69,3 +69,4 @@ gem "refile-mini_magick"
 gem "gon"
 gem 'devise'
 gem 'dotenv-rails'
+gem "bootstrap-sass"
