@@ -1,7 +1,4 @@
-<div class="admin_header">
-  <%= link_to '投稿情報一覧', aed_information_managements_path,class: 'admin_header_list btn btn-primary' %>
-  <%= link_to 'CSVインポート', csv_import_aed_information_managements_path, class: 'admin_header_import btn btn-primary' %>
-</div>
+<%= render 'header/admin_header' %>
 
 <div class="state_select_btn">
   <%= link_to '未承認', search_aed_information_managements_path('未承認'), method: :get, remote: true, class: 'btn btn-danger'%>

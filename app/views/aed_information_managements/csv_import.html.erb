@@ -1,7 +1,4 @@
-<div class="admin_header">
-  <%= link_to '投稿情報一覧', aed_information_managements_path,class: 'admin_header_list btn btn-primary' %>
-  <%= link_to 'CSVインポート', csv_import_aed_information_managements_path, class: 'admin_header_import btn btn-primary' %>
-</div>
+<%= render 'header/admin_header' %>
 
 <div class="import_form">
   <%= form_with url: aed_information_managements_path, local: true, method: :post do |form| %>

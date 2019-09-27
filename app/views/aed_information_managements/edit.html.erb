@@ -1,7 +1,4 @@
-<div class="admin_header">
-    <%= link_to '投稿情報一覧', aed_information_managements_path,class: 'admin_header_list btn btn-primary' %>
-    <%= link_to 'CSVインポート', csv_import_aed_information_managements_path, class: 'admin_header_import btn btn-primary' %>
-</div>
+<%= render 'header/admin_header' %>
 
 <% date_array = %w(月 火 水 木 金 土 日 祝日) %>
 <div class="edit_form">

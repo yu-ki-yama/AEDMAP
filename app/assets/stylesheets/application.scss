@@ -618,6 +618,7 @@ input.search_latlon_submit.btn.btn-primary,input.search_address_submit.btn.btn-p
   position: absolute;
   top: 545px;
   left: 955px;
+  width: 200px;
 }
 
 @media screen and (min-width:1200px) {
@@ -651,7 +652,11 @@ input.search_position_submit.btn.btn-primary {
 .admin_header_import{
   padding: 10px;
   margin: 10px 0 0 50px;
+}
 
+.admin_header_logout{
+  padding: 10px;
+  margin: 10px 0 0 50px;
 }
 
 .import_submit, #btn_clear_file{
@@ -744,4 +749,20 @@ button#file_select_icon {
 
 .import_form > form{
   width: 800px;
+}
+
+//---------------------
+.sessions_container {
+  margin: 50px auto;
+  padding: 10px;
+  border: solid 2px #337ab7;
+}
+
+.sessions_submit {
+  margin: 30px 0;
+}
+
+.error_mes{
+  font-size: 30px;
+  font-weight: bold;
 }
