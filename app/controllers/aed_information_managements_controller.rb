@@ -6,17 +6,35 @@ class AedInformationManagementsController < ApplicationController
   def create
     CSV.read(params[:file_select].path, headers: true).each do |row|
       if AedInformation.where(facility: row['施設名']).where(installation_location: row['設置位置']).blank?
-        AedInformation.create(
-            latitude: row['緯度'],
-            longitude: row['経度'],
-            facility: row['施設名'],
-            installation_location: row['設置位置'],
-            aed_image_id: "",
-            registration_status: true,
-            prefecture: row['都道府県'],
-            address: row['住所'],
-            phone_number: row['電話番号']
-        )
+        unless row['緯度'].nil? || row['経度'].nil?
+          if row['施設名'].nil?
+            row['施設名'] = ""
+          end
+          if row['設置位置'].nil?
+            row['設置位置'] = ""
+          end
+
+          if row['都道府県'].nil?
+            row['都道府県'] = ""
+          end
+          if row['住所'].nil?
+            row['住所'] = ""
+          end
+          if row['電話番号'].nil?
+            row['電話番号'] = ""
+          end
+          AedInformation.create(
+              latitude: row['緯度'],
+              longitude: row['経度'],
+              facility: row['施設名'],
+              installation_location: row['設置位置'],
+              aed_image_id: "",
+              registration_status: true,
+              prefecture: row['都道府県'],
+              address: row['住所'],
+              phone_number: row['電話番号']
+          )
+        end
       end
     end
 
@@ -143,16 +161,12 @@ class AedInformationManagementsController < ApplicationController
   def search
     @select_mode = params['format']
     if params['format'] == '承認済'
-      @aed_inf = AedInformation.where(registration_status: true)
+      @aed_inf = AedInformation.where(registration_status: true).where(prefecture: '北海道')
     elsif params['format'] == '未承認'
       @aed_inf = AedInformation.where(registration_status: false)
     else
       @select_mode = '承認済'
-      if params['search_prefecture'] == '全国'
-        @aed_inf = AedInformation.where(registration_status: true)
-      else
         @aed_inf = AedInformation.where(prefecture: params['search_prefecture'])
-      end
     end
   end
 

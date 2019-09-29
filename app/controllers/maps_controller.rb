@@ -1,33 +1,58 @@
 class MapsController < ApplicationController
   def index
     if request.xhr?
-      @aed_inf = AedInformation.find(params['className'].split('marker')[1].to_i+1)
 
-      if @aed_inf['aed_image_id'] == '' || !@aed_inf['registration_status']
-        @image = helpers.asset_url("noimage.png")
-      else
-        @image = Refile.attachment_url(@aed_inf, :aed_image, :fill, 268, 201, format: "jpeg")
-      end
+      if params['mode'] == "detail"
 
-      @created_at = @aed_inf['created_at'].strftime('%Y/%m/%d')
+        @aed_inf = AedInformation.find(params['className'].split('marker')[1].to_i)
 
-      # 認証前のデータを改変
-      unless @aed_inf['registration_status']
+        if @aed_inf['aed_image_id'] == '' || !@aed_inf['registration_status']
+          @image = helpers.asset_url("noimage.png")
+        else
+          @image = Refile.attachment_url(@aed_inf, :aed_image, :fill, 268, 201, format: "jpeg")
+        end
+
+        @created_at = @aed_inf['created_at'].strftime('%Y/%m/%d')
+
+        # 認証前のデータを改変
+        unless @aed_inf['registration_status']
           @aed_inf["facility"] = '未承認'
           @aed_inf["installation_location"] = '未承認'
           @aed_inf["address"] = '未承認'
           @aed_inf["phone_number"] = '未承認'
+        end
+
+        if @aed_inf['phone_number'].nil?
+          @aed_inf['phone_number'] = '未登録'
+        end
+        if @aed_inf['address'].nil?
+          @aed_inf['address'] = '未登録'
+        end
+
+      elsif params['mode'] == 'find'
+        @response = AedInformation.where(:prefecture => params['search_word'])
+
+      elsif params['mode'] == 'init'
+        #緯度経度から住所取得
+        base_url = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder'
+        request = {
+            'appid' => ENV['YAHOO_CLIENT_ID'],
+            'lat' => params['lat'],
+            'lon' => params['lng'],
+            'output' => 'json'
+        }
+        url = base_url + '?' + URI.encode_www_form(request)
+        json = open(url).read
+        data = JSON.parse(json)
+
+        prefecture = data['Feature'][0]['Property']['AddressElement'][0]['Name']
+        coordinateArray = AedInformation.where(:prefecture => prefecture)
+        @response = {prefecture: prefecture, coordinateArray: coordinateArray}
       end
 
-      if @aed_inf['phone_number'].nil?
-        @aed_inf['phone_number'] = '未登録'
-      end
-      if @aed_inf['address'].nil?
-        @aed_inf['address'] = '未登録'
-      end
 
     else
-      gon.aed_inf = AedInformation.all
+      #サイト読み込み時
     end
   end
 

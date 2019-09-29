@@ -46,7 +46,7 @@
 
 .place_detail{
     position: absolute;
-    top: -5px;
+    top: 0;
     left: 273px;
     width: 290px;
 }
@@ -96,9 +96,6 @@
     border-radius: 25px;
     padding: 10px;
     position: absolute;
-    z-index: 2;
-    right: -75px;
-    bottom: -110px;
     border: solid black 3px;
 }
 
@@ -110,9 +107,6 @@
     border-radius: 25px;
     padding: 10px;
     position: absolute;
-    z-index: 2;
-    right: -90px;
-    bottom: -35px;
     border: solid black 3px;
 }
 
@@ -124,9 +118,6 @@
     border-radius: 25px;
     padding: 10px;
     position: absolute;
-    z-index: 2;
-    right: -90px;
-    bottom: 37px;
     border: solid black 3px;
 }
 
@@ -230,6 +221,8 @@
   .main-map-header{
     display: block;
   }
+
+
 }
 
 
@@ -410,18 +403,6 @@ button#aed_inf_confirm {
   text-align: center;
 }
 
-@media screen and (max-width:750px) {
-  .form-main-content{
-    margin: 0 75px;
-  }
-  .image_shutter_btn {
-    left: 315px;
-  }
-  #retry{
-    left: 275px;
-  }
-}
-
 .header{
   width: 100%;
   height: 60px;
@@ -559,14 +540,6 @@ input.search_latlon_submit.btn.btn-primary,input.search_address_submit.btn.btn-p
 
 .edit_form_facility_detail > p > input, .edit_form_position > p > input{
   text-align: center;
-}
-
-#aed_information_facility{
-  width: 500px;
-}
-
-#aed_information_installation_location{
-  width: 300px;
 }
 
 #aed_information_postal_code, #aed_information_prefecture {
@@ -765,4 +738,152 @@ button#file_select_icon {
 .error_mes{
   font-size: 30px;
   font-weight: bold;
+}
+
+//------------------------
+#loading {
+  display: table;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.8;
+  z-index: 100;
+}
+
+#loading .loadingMsg {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 140px;
+  background: image-url("loading.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.loadingMsg {
+  font-weight: bold;
+  font-size: 32px;
+}
+
+//--------------------------
+.dropholder{
+  width: 360px;
+  height: 60px;
+  padding: 0 0 0 20px;
+  border-radius: 10px;
+  font: 24px arial;
+  color: #fff;
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid #4d5661;
+  animation: move 3s ease-in-out infinite;
+  position: absolute;
+  z-index: 50;
+  top: 70px;
+  left: 24vw;
+}
+
+.dropholder:hover, .dropholder:hover:after{
+  animation-play-state:paused;
+}
+
+.dropholder > p {
+  float: left;
+  line-height:60px;
+}
+
+.dropdown > p{
+  float: left;
+  line-height:60px;
+  font-size:24px;
+}
+.dropdown, .dropholder{
+  background:linear-gradient(#006bff, #337ab7);
+}
+.dropdown{
+  margin-left:20px;
+  float: left;
+  width: 208px;
+  padding:0 0 0 20px;
+  border-radius:0 10px 10px 0;
+  cursor: pointer;
+  height:58px;
+  border-left:1px solid #4d5661;
+  position: relative;
+}
+.dropdown:hover{
+  background:linear-gradient(#006bff, #337ab7);
+}
+.dropdown:after{
+  content: "▾";
+  font-size: 24px;
+  position: absolute;
+  right: 20px;
+  top: 14px;
+  display: block;
+}
+
+.menu{
+  position: absolute;
+  right:0;
+  top:70px;
+  width: 228px;
+  cursor: pointer;
+  opacity:0;
+  transform-style: preserve-3d;
+  transform:rotatey(180deg) rotateX(5deg) translatey(100px);
+  backface-visibility: hidden;
+  background:linear-gradient(#4dc2f8 ,#0d82b9);
+  border:2px solid #0d82b9;
+  border-radius:10px;
+  transition:all 0.8s;
+  z-index:5;
+  overflow:hidden;
+}
+.menu li{
+  padding: 10px 10px;
+  border-bottom:1px dotted #fff;
+  color:#e8f8ff;
+  transition:all 0.3s;
+}
+.menu li:hover{
+  background:#61ccfd;
+  padding-left:20px;
+}
+.menu li:last-child{
+  border:none;
+}
+
+.showMenu{
+  opacity:1;
+  transform:rotateX(0deg) translatey(0px);
+}
+
+@keyframes move{
+  0%, 100%{transform:translateY(-10px);}
+  50%{transform:translateY(0);}
+}
+
+@keyframes moveShadow{
+  0%,100%{transform:translateY(10px);opacity:0.4;}
+  50%{transform:translateY(0);opacity:1;}
+}
+
+@media screen and (max-width:749px) {
+  .form-main-content{
+    margin: 0 75px;
+  }
+  .image_shutter_btn {
+    left: 315px;
+  }
+  #retry{
+    left: 275px;
+  }
+  .dropholder{
+    top: 10px;
+    left: 180px;
+  }
 }
