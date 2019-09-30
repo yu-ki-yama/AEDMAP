@@ -61,9 +61,24 @@ class MapsController < ApplicationController
   end
 
   def create
+    #緯度経度から住所取得
+    base_url = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder'
+    request = {
+        'appid' => ENV['YAHOO_CLIENT_ID'],
+        'lat' => aed_params[:latitude],
+        'lon' => aed_params[:longitude],
+        'output' => 'json'
+    }
+    url = base_url + '?' + URI.encode_www_form(request)
+    json = open(url).read
+    data = JSON.parse(json)
+
+    prefecture = data['Feature'][0]['Property']['AddressElement'][0]['Name']
+
     create_params = aed_params
     create_params[:aed_image] = StringIO.new(Base64.decode64(aed_params[:image_url]))
     create_params.delete(:image_url)
+    create_params['prefecture'] = prefecture
     AedInformation.new(create_params).save
 
     redirect_to maps_path

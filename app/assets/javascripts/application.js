@@ -52,7 +52,7 @@ $(document).on("turbolinks:load", function() {
 
         $(function () {
             const STARTZOOMLEVEL = 18
-            const LIMITRADIUS = 800
+            const LIMITRADIUS = 600
 
             function getCoordinate(callback) {
                 //ユーザーの端末がGeoLocation APIに対応しているかの判定
