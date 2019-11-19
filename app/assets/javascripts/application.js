@@ -237,26 +237,28 @@ $(document).on("turbolinks:load", function() {
                     clickOnMarkerClass = ""
                 })
 
-                // 都道府県選択ボックスを押した時
-                $(".dropdown").on('click', function() {
-                    $(".menu").toggleClass("showMenu")
-
-                    $(".menu > li").on('click', function(e) {
+                // // 都道府県選択ボックスを押した時
+                // $(".dropdown").on('click', function() {
+                //     $(".menu").toggleClass("showMenu")
+                //     console.log('menuclick')
+                //
+                    $(".map_pulldown").on('change', function(e) {
                         dispLoading('読み込み中...')
                         $( 'html,body' ).animate( {scrollTop:0} , 'slow' ) ;
 
-                        $(".dropdown > p").html($(this).html())
-                        $(".menu").removeClass("showMenu")
+                        // $(".dropdown > p").html($(this).html())
+                        // $(".menu").toggleClass("showMenu")
 
                         map.removeLayer(markers)
                         circle_array.forEach(function (circle) {
                             map.removeLayer(circle)
                         })
+                        
 
                         $.ajax({
                             type: 'GET',
                             url: location.pathname,
-                            data: {search_word: e.target.innerText, mode: "find"},
+                            data: {search_word: $(this).val(), mode: "find"},
                             dataType: 'json'
                         }).done(function (data) {
                             circleAbleAED(map, data['response'])
@@ -269,7 +271,7 @@ $(document).on("turbolinks:load", function() {
 
 
                     })
-                })
+                // })
 
                 //マップにマーカー情報反映
                 map.addLayer(markers)
