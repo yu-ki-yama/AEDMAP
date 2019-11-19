@@ -53,6 +53,9 @@ $(document).on("turbolinks:load", function() {
         $(function () {
             const STARTZOOMLEVEL = 18
             const LIMITRADIUS = 600
+            let map
+            let markers
+            let circle_array
 
             function getCoordinate(callback) {
                 //ユーザーの端末がGeoLocation APIに対応しているかの判定
@@ -64,7 +67,7 @@ $(document).on("turbolinks:load", function() {
                             let data = position.coords
                             let latitude = data.latitude
                             let longitude = data.longitude
-                            let map = callback(latitude, longitude)
+                            map = callback(latitude, longitude)
 
                             //現在位置から都道府県判定
                             $.ajax({
@@ -74,8 +77,12 @@ $(document).on("turbolinks:load", function() {
                                 dataType: 'json'
                             }).done(function (data) {
                                 removeLoading()
-                                circleAbleAED(map, data['response']['coordinateArray'])
-                                $('.dropdown > p').text(data['response']['prefecture'])
+                                let aed_inf = circleAbleAED(map, data['response']['coordinateArray'])
+                                map = aed_inf['map']
+                                markers = aed_inf['markers']
+                                circle_array = aed_inf['circle_array']
+                                //セレクトボックスの表示変更
+                                $('.map_pulldown').val(data['response']['prefecture'])
 
                             }).fail(function () {
                                 removeLoading()
@@ -84,14 +91,14 @@ $(document).on("turbolinks:load", function() {
 
                         },
                         function (error) {
-                            var errorInfo = [
+                            let errorInfo = [
                                 "原因不明のエラーが発生しました…。",
                                 "位置情報の取得が許可されませんでした…。",
                                 "電波状況などで位置情報が取得できませんでした…。",
                                 "位置情報の取得に時間がかかりタイムアウトしました…。"
                             ]
-                            var errorNo = error.code
-                            var errorMessage = "[エラー番号: " + errorNo + "]\n" + errorInfo[errorNo]
+                            let errorNo = error.code
+                            let errorMessage = "[エラー番号: " + errorNo + "]\n" + errorInfo[errorNo]
                             alert(errorMessage)
                         },
                         {
@@ -101,7 +108,7 @@ $(document).on("turbolinks:load", function() {
                         })
 
                 } else {
-                    var errorMessage = "お使いの端末は、GeoLacation APIに対応していません。"
+                    let errorMessage = "お使いの端末は、GeoLacation APIに対応していません。"
                     alert(errorMessage)
                 }
             }
@@ -123,7 +130,6 @@ $(document).on("turbolinks:load", function() {
             function circleAbleAED(map, coordinateArray) {
                 let markers = L.markerClusterGroup()
                 let clickOnMarkerClass = ""
-                let currentOn = ""
                 let circle_array = []
                 //全マーカー作成
                 coordinateArray.forEach(function (coordinateList) {
@@ -158,7 +164,7 @@ $(document).on("turbolinks:load", function() {
                     let circle = L.circleMarker([coordinateList['latitude'], coordinateList['longitude']], {
                         radius: LIMITRADIUS * map.getZoomScale(STARTZOOMLEVEL, 18),
                         fillColor: 'blue',
-                        fillOpacity: 0.1,
+                        fillOpacity: 0.3,
                         stroke: ""
                     }).addTo(map)
 
@@ -166,54 +172,49 @@ $(document).on("turbolinks:load", function() {
 
                     //ポップアップをクリックした時のイベント
                     function clickEvt(e) {
-                        // if(currentOn === e.target.className){
-                        //     currentOn = ""
-                        // }else {
-                        //     currentOn = e.target.className
+                        dispLoading("処理中...")
 
-                            dispLoading("処理中...")
+                        //マーカーの色をクリックされた時のものに変更
+                        if (clickOnMarkerClass !== "") {
+                            $(clickOnMarkerClass).removeClass('leaflet-marker-icon-color-white')
+                        }
 
-                            //マーカーの色をクリックされた時のものに変更
-                            if (clickOnMarkerClass !== "") {
-                                $(clickOnMarkerClass).removeClass('leaflet-marker-icon-color-white')
-                            }
-                            clickOnMarkerClass = `.${e.target.className}-img`
-                            map.setView([e.target.latitude + 0.0012, e.target.longitude])
-                            $(clickOnMarkerClass).addClass('leaflet-marker-icon-color-white')
+                        clickOnMarkerClass = `.${e.target.className}-img`
+                        map.setView([e.target.latitude + 0.0012, e.target.longitude])
+                        $(clickOnMarkerClass).addClass('leaflet-marker-icon-color-white')
 
-                            //クリックされたマーカーの情報を取得
-                            $.ajax({
-                                type: 'GET',
-                                url: '/maps',
-                                data: {className: e.target.className, mode: "detail"},
-                                dataType: 'json'
-                            }).done(function (data) {
-                                removeLoading()
+                        //クリックされたマーカーの情報を取得
+                        $.ajax({
+                            type: 'GET',
+                            url: '/maps',
+                            data: {className: e.target.className, mode: "detail"},
+                            dataType: 'json'
+                        }).done(function (data) {
+                            removeLoading()
 
-                                $('.' + e.target.className).text("")
-                                $('.' + e.target.className).append('<img src=' + data['image'] + ' width="268" height="201" class="place_image">');
-                                $('.' + e.target.className).css({
-                                    'width': '550px',
-                                    'height': '270px',
-                                    'position': 'relative'
-                                })
-                                $('.' + e.target.className).append('' +
-                                    '<h3 class="margin0">施設名</h3>' +
-                                    '<div class="place_detail_facility">' + data["aed"]["facility"] + '</div>' +
-                                    '<div class="place_detail">' +
-                                    '<h3 class="margin0">設置場所</h3>' +
-                                    '<div class="place_detail_set">' + data["aed"]["installation_location"] + '</div>' +
-                                    '<h3 class="margin0">住所</h3>' +
-                                    '<div class="place_detail_address">' + data["aed"]["address"] + '</div>' +
-                                    '<div class="inline-block tel-title">電話番号</div><div class="inline-block tel-num">' + data["aed"]["phone_number"] + '</div><br>' +
-                                    '<div class="inline-block create-title">投稿日</div><div class="inline-block create-at">' + data["created_at"] + '</div><br>' +
-                                    '</div>')
-
-                            }).fail(function () {
-                                removeLoading()
-                                alert('情報の取得に失敗しました')
+                            $('.' + e.target.className).text("")
+                            $('.' + e.target.className).append('<img src=' + data['image'] + ' width="268" height="201" class="place_image">');
+                            $('.' + e.target.className).css({
+                                'width': '550px',
+                                'height': '270px',
+                                'position': 'relative'
                             })
-                        // }
+                            $('.' + e.target.className).append('' +
+                                '<h3 class="margin0">施設名</h3>' +
+                                '<div class="place_detail_facility">' + data["aed"]["facility"] + '</div>' +
+                                '<div class="place_detail">' +
+                                '<h3 class="margin0">設置場所</h3>' +
+                                '<div class="place_detail_set">' + data["aed"]["installation_location"] + '</div>' +
+                                '<h3 class="margin0">住所</h3>' +
+                                '<div class="place_detail_address">' + data["aed"]["address"] + '</div>' +
+                                '<div class="inline-block tel-title">電話番号</div><div class="inline-block tel-num">' + data["aed"]["phone_number"] + '</div><br>' +
+                                '<div class="inline-block create-title">投稿日</div><div class="inline-block create-at">' + data["created_at"] + '</div><br>' +
+                                '</div>')
+
+                        }).fail(function () {
+                            removeLoading()
+                            alert('情報の取得に失敗しました')
+                        })
                     }
 
                     //スケールに応じて円の大きさを調整
@@ -237,45 +238,46 @@ $(document).on("turbolinks:load", function() {
                     clickOnMarkerClass = ""
                 })
 
-                // // 都道府県選択ボックスを押した時
-                // $(".dropdown").on('click', function() {
-                //     $(".menu").toggleClass("showMenu")
-                //     console.log('menuclick')
-                //
-                    $(".map_pulldown").on('change', function(e) {
-                        dispLoading('読み込み中...')
-                        $( 'html,body' ).animate( {scrollTop:0} , 'slow' ) ;
-
-                        // $(".dropdown > p").html($(this).html())
-                        // $(".menu").toggleClass("showMenu")
-
-                        map.removeLayer(markers)
-                        circle_array.forEach(function (circle) {
-                            map.removeLayer(circle)
-                        })
-                        
-
-                        $.ajax({
-                            type: 'GET',
-                            url: location.pathname,
-                            data: {search_word: $(this).val(), mode: "find"},
-                            dataType: 'json'
-                        }).done(function (data) {
-                            circleAbleAED(map, data['response'])
-                            map.setView([data['response'][0]['latitude'], data['response'][0]['longitude']], 10)
-                            removeLoading()
-                        }).fail(function () {
-                            removeLoading()
-                            alert('情報の取得に失敗しました')
-                        })
-
-
-                    })
-                // })
-
                 //マップにマーカー情報反映
                 map.addLayer(markers)
+
+                return {'map': map, 'circle_array' : circle_array, 'markers' : markers}
             }
+
+            //都道府県を選択された地域のデータ読み込み
+            $(".map_pulldown").on('change', function(e) {
+                dispLoading('読み込み中...')
+                $( 'html,body' ).animate( {scrollTop:0} , 'slow' ) ;
+
+                // $(".dropdown > p").html($(this).html())
+                // $(".menu").toggleClass("showMenu")
+                console.log('再表示')
+                map.removeLayer(markers)
+                circle_array.forEach(function (circle) {
+                    map.removeLayer(circle)
+                })
+
+                $.ajax({
+                    type: 'GET',
+                    url: location.pathname,
+                    data: {search_word: $(this).val(), mode: "find"},
+                    dataType: 'json'
+                }).done(function (data) {
+                    let aed_inf = circleAbleAED(map, data['response'])
+                    map = aed_inf['map']
+                    markers = aed_inf['markers']
+                    circle_array = aed_inf['circle_array']
+                    map.setView([data['response'][0]['latitude'], data['response'][0]['longitude']], 9)
+                    map.setView([data['response'][0]['latitude'], data['response'][0]['longitude']], 10)
+                    removeLoading()
+                }).fail(function () {
+                    removeLoading()
+                    alert('情報の取得に失敗しました')
+                })
+
+
+            })
+
 
             getCoordinate(mapInit)
         })
