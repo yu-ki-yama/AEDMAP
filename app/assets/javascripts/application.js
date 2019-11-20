@@ -17,39 +17,9 @@
 //= require_tree .
 
 $(document).on("turbolinks:load", function() {
+    //メインのマップ機能
     if($('#map').length) {
-
-        $(document).on("mouseenter", ".place_detail_facility", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_facility", function () {
-            $('.all_sentence').remove()
-        });
-
-        $(document).on("mouseenter", ".place_detail_address", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence_address">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_address", function () {
-            $('.all_sentence_address').remove()
-        });
-
-        $(document).on("mouseenter", ".place_detail_set", function (e) {
-            $('.' + e.currentTarget.className).append('<div class="all_sentence_set">' + $('.' + e.currentTarget.className).text() + '</div>')
-        });
-        $(document).on("mouseleave", ".place_detail_set", function () {
-            $('.all_sentence_set').remove()
-        });
-
-        $(document).on("mouseenter", ".all_sentence", function (e) {
-            $('.all_sentence').remove()
-        });
-        $(document).on("mouseenter", ".all_sentence_address", function (e) {
-            $('.all_sentence_address').remove()
-        });
-        $(document).on("mouseenter", ".all_sentence_set", function (e) {
-            $('.all_sentence_set').remove()
-        });
-
+        //地図の描画
         $(function () {
             const STARTZOOMLEVEL = 18
             const LIMITRADIUS = 600
@@ -164,7 +134,7 @@ $(document).on("turbolinks:load", function() {
                     let circle = L.circleMarker([coordinateList['latitude'], coordinateList['longitude']], {
                         radius: LIMITRADIUS * map.getZoomScale(STARTZOOMLEVEL, 18),
                         fillColor: 'blue',
-                        fillOpacity: 0.3,
+                        fillOpacity: 0.1,
                         stroke: ""
                     }).addTo(map)
 
@@ -180,7 +150,7 @@ $(document).on("turbolinks:load", function() {
                         }
 
                         clickOnMarkerClass = `.${e.target.className}-img`
-                        map.setView([e.target.latitude + 0.0012, e.target.longitude])
+                        map.setView([e.target.latitude, e.target.longitude])
                         $(clickOnMarkerClass).addClass('leaflet-marker-icon-color-white')
 
                         //クリックされたマーカーの情報を取得
@@ -251,7 +221,6 @@ $(document).on("turbolinks:load", function() {
 
                 // $(".dropdown > p").html($(this).html())
                 // $(".menu").toggleClass("showMenu")
-                console.log('再表示')
                 map.removeLayer(markers)
                 circle_array.forEach(function (circle) {
                     map.removeLayer(circle)
@@ -281,8 +250,44 @@ $(document).on("turbolinks:load", function() {
 
             getCoordinate(mapInit)
         })
+
+        //ポップアップ内の施設名の拡大全表示
+        $(document).on("mouseenter", ".place_detail_facility", function (e) {
+            $('.' + e.currentTarget.className).append('<div class="all_sentence">' + $('.' + e.currentTarget.className).text() + '</div>')
+        })
+        $(document).on("mouseleave", ".place_detail_facility", function () {
+            $('.all_sentence').remove()
+        })
+
+        //ポップアップ内の住所の拡大全表示
+        $(document).on("mouseenter", ".place_detail_address", function (e) {
+            $('.' + e.currentTarget.className).append('<div class="all_sentence_address">' + $('.' + e.currentTarget.className).text() + '</div>')
+        })
+        $(document).on("mouseleave", ".place_detail_address", function () {
+            $('.all_sentence_address').remove()
+        })
+
+        //ポップアップ内の設置場所の拡大全表示
+        $(document).on("mouseenter", ".place_detail_set", function (e) {
+            $('.' + e.currentTarget.className).append('<div class="all_sentence_set">' + $('.' + e.currentTarget.className).text() + '</div>')
+        })
+        $(document).on("mouseleave", ".place_detail_set", function () {
+            $('.all_sentence_set').remove()
+        })
+
+        //ポップアップ内の設置場所の拡大全表示
+        $(document).on("mouseenter", ".all_sentence", function (e) {
+            $('.all_sentence').remove()
+        })
+        $(document).on("mouseenter", ".all_sentence_address", function (e) {
+            $('.all_sentence_address').remove()
+        })
+        $(document).on("mouseenter", ".all_sentence_set", function (e) {
+            $('.all_sentence_set').remove()
+        })
     }
 
+    //投稿画面の写真機能
     if($('#video').length) {
         $(function() {
             let localstream
@@ -364,6 +369,7 @@ $(document).on("turbolinks:load", function() {
             })
         })
     }
+
     //ハンバーガメニュー操作
     $(function() {
         $('.menu-trigger').on('click',function(){
@@ -404,6 +410,7 @@ $(document).on("turbolinks:load", function() {
         })
     })
 
+    //編集画面のマップ機能
     if($('#editMap').length) {
         let STARTZOOMLEVEL = 18
         let map = mapInit(gon.aed_inf['latitude'], gon.aed_inf['longitude'])
@@ -558,16 +565,19 @@ $(document).on("turbolinks:load", function() {
     // アイコンをクリックした場合は、ファイル選択をクリックした挙動とする.
     $('#file_select_icon').on('click', function() {
         $('#file_select').click()
-    });
+    })
+
     // ファイル選択時に表示用テキストボックスへ値を連動させる.
     $('#file_select').parent().on('change', '#file_select', function() {
         $('#file_name').val($('#file_select').prop('files')[0].name)
-    });
+    })
+
     // ファイル選択値をクリア.
     $('#btn_clear_file').on('click', function() {
         $('#file_select').html('<input class="form-control" style="display:none" type="file" name="file_select" id="file_select">')
         $('#file_name').val('')
     })
+
     //　送信ボタン制御
     $(".import_submit").on('click', function() {
         if($('#file_name').val() === ""){
@@ -577,6 +587,7 @@ $(document).on("turbolinks:load", function() {
             return true
         }
     })
+
     //セレクトボックスで選択時
     $(".prefecture-select > select").on('change', function() {
         dispLoading('読み込み中...')
@@ -592,6 +603,8 @@ $(document).on("turbolinks:load", function() {
             alert('情報の取得に失敗しました')
         })
     })
+
+
     $(window).resize(function(){
         if($(window).width() > 735){
             $('.menu-trigger').removeClass('active')
@@ -600,6 +613,7 @@ $(document).on("turbolinks:load", function() {
             $('.overlay').removeClass('open')
         }
     })
+
     // ロード画面
     function dispLoading(msg){
         if( msg === undefined ){
@@ -611,10 +625,12 @@ $(document).on("turbolinks:load", function() {
             $("body").append("<div id='loading'>" + dispMsg + "</div>")
         }
     }
+
     //　ロード画面終了
     function removeLoading(){
         $("#loading").remove()
     }
+
     //　ロード待機画面表示
     $(".load-event").on('click', function() {
         dispLoading("読み込み中...")

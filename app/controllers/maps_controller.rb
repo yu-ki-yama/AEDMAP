@@ -14,7 +14,7 @@ class MapsController < ApplicationController
 
         @created_at = @aed_inf['created_at'].strftime('%Y/%m/%d')
 
-        # 認証前のデータを改変
+        #認証前のデータを改変
         unless @aed_inf['registration_status']
           @aed_inf["facility"] = '未承認'
           @aed_inf["installation_location"] = '未承認'
@@ -49,7 +49,6 @@ class MapsController < ApplicationController
         coordinateArray = AedInformation.where(:prefecture => prefecture)
         @response = {prefecture: prefecture, coordinateArray: coordinateArray}
       end
-
 
     else
       #サイト読み込み時

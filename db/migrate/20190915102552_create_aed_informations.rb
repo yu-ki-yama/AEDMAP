@@ -1,7 +1,7 @@
 class CreateAedInformations < ActiveRecord::Migration[5.2]
   def change
-    create_table :aed_informations, :options => 'ENGINE=InnoDB ROW_FORMAT=DYNAMIC' do |t|
-
+    # create_table :aed_informations, :options => 'ENGINE=InnoDB ROW_FORMAT=DYNAMIC' do |t|
+    create_table :aed_informations do |t|
       t.float :latitude, null: false
       t.float :longitude, null: false
       t.string :facility, null: false
